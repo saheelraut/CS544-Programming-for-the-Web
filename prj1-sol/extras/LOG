@@ -1,0 +1,15 @@
+>> a1 = 22
+{ a1: 22 }
+>> a2 = a1 * b1
+{ a2: 0 }
+>> b1 = 3
+{ a2: 66, b1: 3 }
+>> a3 = -a1 + a2
+{ a3: 44 }
+>> a1 = 5
+{ a1: 5, a2: 15, a3: 10 }
+>> a1 = a3 + 1
+:CIRCULAR_REF: circular ref involving a1
+>> a1 = a2 -
+:SYNTAX: unexpected token at '<EOF>': expected 'num'
+>>

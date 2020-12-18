@@ -1,0 +1,12 @@
+digraph G {
+  rankdir=LR;
+  node [shape=ellipse, style=filled];
+  bgcolor=transparent;
+  label = "a3 = a1 + a2"; labelloc = top;
+
+  a1[label="a1:22"];  a2[label="a2:66"]; b1[label="b1:3"];
+  a3[label="a3:88"];
+
+  a1 -> a2; b1 -> a2;
+  a1 -> a3; a2 -> a3;
+}

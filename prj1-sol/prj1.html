@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 544: Project 1</title>
+    <link href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" 
+       rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML" async=""></script>    
+<link href="prj1/hl-fine_blue.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../../index.html" class="material-icons">house</a></li>
+	<li><a href="../../docs/index.html">Docs</a></li>
+	<li><a href="../../exercises/index.html">Exercises</a></li>
+	<li><a href="../../hws/index.html">Homeworks</a></li>
+	<li><a href="../../misc/index.html">Misc</a></li>
+	<li><a href="../../projects/index.html">Projects</a></li>
+	<li><a href="../../slides/index.html">Slides</a></li>
+	<li><a id="loginAction"></a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj1.umt:1:0"><h1 data-coord="prj1.umt:1:0">Project 1</h1><p data-coord="prj1.umt:3:0"><strong data-coord="prj1.umt:3:0">Due</strong>: Sep 23 by 11:59p
+</p><p data-coord="prj1.umt:5:0"><strong data-coord="prj1.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj1.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj1.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in your letter grade
+for the entire course being reduced by one level.
+</p><p data-coord="prj1.umt:9:0">This document first provides the aims of this project followed by the
+necessary background.  It then lists the requirements as explicitly as
+possible.  This is followed by a log which should help you understand
+the requirements.  Finally, it provides some hints as to how those
+requirements can be met.
+</p><section data-coord="prj1.umt:15:0"><h2 data-coord="prj1.umt:15:0">Aims</h2><p data-coord="prj1.umt:18:0">The aims of this project are as follows:
+</p><ul data-coord="prj1.umt:20:0"><li data-coord="prj1.umt:20:0"><p data-coord="prj1.umt:20:4">To ensure that you have set up your VM as specified in the
+<em data-coord="prj1.umt:20:104"><a href="../../misc/vm-setup/vm-setup.html" data-coord="prj1.umt:20:104">VM Setup</a></em> and
+<em data-coord="prj1.umt:20:162"><a href="../../misc/git-setup/git-setup.html" data-coord="prj1.umt:20:162">Git Setup</a></em>
+documents.
+</p></li><li data-coord="prj1.umt:25:0"><p data-coord="prj1.umt:25:4">To get you to write a non-trivial JavaScript program.
+</p></li><li data-coord="prj1.umt:27:0"><p data-coord="prj1.umt:27:4">To allow you to familiarize yourself with the programming
+environment you will be using in this course.
+</p></li><li data-coord="prj1.umt:30:0"><p data-coord="prj1.umt:30:4">To make you design an in-memory indexing scheme.
+</p></li><li data-coord="prj1.umt:32:0"><p data-coord="prj1.umt:32:4">To expose you to the power of recursive programming.
+</p></li><li data-coord="prj1.umt:34:0"><p data-coord="prj1.umt:34:4">To introduce you
+to <em data-coord="prj1.umt:34:89"><a href="https://en.wikipedia.org/wiki/Test-driven_development" data-coord="prj1.umt:34:89">Test-Driven Development TDD</a></em>.
+</p></li></ul></section><section data-coord="prj1.umt:39:0"><h2 data-coord="prj1.umt:39:0">Background</h2><p data-coord="prj1.umt:42:0">This project involves building the internals of a spreadsheet with
+all data stored entirely in memory.
+</p><p data-coord="prj1.umt:45:0">The reasons spreadsheets are extremely popular include:
+</p><ol data-coord="prj1.umt:47:0"><li data-coord="prj1.umt:47:0"><p data-coord="prj1.umt:47:4">An intuitive GUI.
+</p></li><li data-coord="prj1.umt:49:0"><p data-coord="prj1.umt:49:4">An intuitive model of computation which just works.  This model is
+so intuitive that non-programmers use it without realizing that
+they are programming.
+</p></li></ol><p data-coord="prj1.umt:53:0">In this project, we will concentrate on (2).
+</p><p data-coord="prj1.umt:55:0">Visually, a spreadsheet is identified by a grid of cells with each
+cell identified by its column and row coordinates. The column
+coordinate is specified by a letter <samp data-coord="prj1.umt:55:165">a</samp>, <samp data-coord="prj1.umt:55:170">b</samp>, \(\ldots\), <samp data-coord="prj1.umt:55:186">z</samp> while the
+row coordinate is specified by an integer <samp data-coord="prj1.umt:55:242">1</samp>, <samp data-coord="prj1.umt:55:247">2</samp>, \(\ldots\), <samp data-coord="prj1.umt:55:263">99</samp>.
+So the first cell would have coordinates <samp data-coord="prj1.umt:55:310">a1</samp> and the last cell would
+have coordinates <samp data-coord="prj1.umt:55:356">z99</samp>.
+</p><p data-coord="prj1.umt:62:0">The model of computation behind spreadsheets is
+<em data-coord="prj1.umt:62:105"><a href="https://en.wikipedia.org/wiki/Data-driven_programming" data-coord="prj1.umt:62:105">data-driven
+programming</a></em>.  The computation is driven entirely by the dependencies
+within the data rather than some predetermined order.  So if a change
+is made to a particular spreadsheet cell \(c\), then that change is
+automatically propagated to all other cells which depend directly or
+indirectly on \(c\).
+</p><p data-coord="prj1.umt:70:0">Assuming no cyclic dependencies, a spreadsheet can use a
+<em data-coord="prj1.umt:70:113"><a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph" data-coord="prj1.umt:70:113">Directed
+Acyclic Graph</a></em> or DAG to maintain the dependencies between its data
+cells.  The use of a DAG will minimize the computation necessary to
+respond to a data change.
+</p><p data-coord="prj1.umt:76:0">The following sequence of diagrams show how the DAG evolves in response
+to updates made to a spreadsheet:
+</p><p data-coord="prj1.umt:79:0">A cell <samp data-coord="prj1.umt:79:7">a1</samp> is given a constant value.
+</p><img src="figs/a1.png"/><p data-coord="prj1.umt:83:0">We can add a formula referring to a cell <samp data-coord="prj1.umt:83:41">b1</samp> which has not yet been
+given a value because the value of a cell defaults to 0.
+</p><img src="figs/a2.png"/><p data-coord="prj1.umt:88:0">In the above figure, cell <samp data-coord="prj1.umt:88:26">a2</samp> is <strong data-coord="prj1.umt:88:34">dependent</strong> on cells <samp data-coord="prj1.umt:88:55">a1</samp> and <samp data-coord="prj1.umt:88:64">b1</samp>
+while cells <samp data-coord="prj1.umt:88:81">a1</samp> and <samp data-coord="prj1.umt:88:90">b1</samp> are <strong data-coord="prj1.umt:88:99">prerequisites</strong> for cell <samp data-coord="prj1.umt:88:124">a2</samp>.
+</p><p data-coord="prj1.umt:91:0">When we actually define <samp data-coord="prj1.umt:91:24">b1</samp>, <samp data-coord="prj1.umt:91:30">a2</samp> is automatically updated
+because <samp data-coord="prj1.umt:91:68">a2</samp> is dependent on <samp data-coord="prj1.umt:91:89">b1</samp>.
+</p><img src="figs/b1.png"/><p data-coord="prj1.umt:96:0">We can extend the dependency chains to a new cell <samp data-coord="prj1.umt:96:50">a3</samp>:
+</p><img src="figs/a3.png"/><p data-coord="prj1.umt:101:0">When we change <samp data-coord="prj1.umt:101:15">a1</samp>, those changes are propagated to all its direct
+and indirect dependencies.
+</p><img src="figs/a1-1.png"/><p data-coord="prj1.umt:107:0">Besides the underlying DAG, another aspect of spreadsheets worth noting
+is the location independence of formula; i.e. a formula can be copied
+from one cell to another and doing so will adjust the cell references
+in the formula.  So for example, if the above formula <samp data-coord="prj1.umt:107:266">a3 = a1 + a2</samp>
+is copied over to cell <samp data-coord="prj1.umt:107:304">c5</samp>, then it would be adjusted to
+<samp data-coord="prj1.umt:107:339">c5 = c3 + c4</samp>.
+</p><p data-coord="prj1.umt:114:0">In some situations, this adjustment is not desired.  This can be
+specified by preceeding the corresponding coordinate by a <samp data-coord="prj1.umt:114:123">$</samp> to fix
+that coordinate.  For example, if the formula <samp data-coord="prj1.umt:114:180">f2 = e5 + $e3 + e$4 +
+$e$6</samp> is copied over to <samp data-coord="prj1.umt:114:227">g7</samp>, the copied formula would be <samp data-coord="prj1.umt:114:261">g7 = f10 +
+$e8 + f$4 + $e$6</samp>,
+</p></section><section data-coord="prj1.umt:120:0"><h2 data-coord="prj1.umt:120:0">Requirements</h2><p data-coord="prj1.umt:124:0">You must push a <samp data-coord="prj1.umt:124:16">submit/prj1-sol</samp> directory to your <samp data-coord="prj1.umt:124:52">master</samp> branch in
+your github repository such that typing  <samp data-coord="prj1.umt:124:199">./index.mjs</samp>
+within that directory is sufficient to run your project.
+</p><p data-coord="prj1.umt:129:0">You are being provided with an <a href="prj1-sol/index.mjs?colorize=true" data-coord="prj1.umt:129:67">index.mjs</a> and <a href="prj1-sol/src/cli.mjs?colorize=true" data-coord="prj1.umt:129:119">cli.mjs</a> which
+provide the required input-output behavior.  You are also being
+provided with a <a href="prj1-sol/src/expr-parser.mjs?colorize=true" data-coord="prj1.umt:129:259">parser</a>
+which can parse spreadsheet formulae.  What you specifically need to
+do is add code to the provided
+<a href="./prj1-sol/src/spreadsheet.mjs?colorize=true" data-coord="prj1.umt:129:414">spreadsheet.mjs</a> source
+file as per the requirements in that file.
+</p><p data-coord="prj1.umt:139:0">Additionally, your <samp data-coord="prj1.umt:139:19">submit/prj1-sol</samp> <strong data-coord="prj1.umt:139:37">must</strong> contain a <samp data-coord="prj1.umt:139:54">vm.png</samp>
+image file to verify that you have set up your VM correctly.  Specifically,
+the image must show an x2go client window running on your VM.  The captured
+x2go window must show a terminal window containing the output
+of the following commands:
+</p><pre>$ hostname<span class="hl opt">;</span> hostname <span class="hl kwb">-I</span>
+$ <span class="hl kwc">ls</span> ~<span class="hl opt">/</span>projects
+$ <span class="hl kwc">ls</span> ~<span class="hl opt">/</span>cs544
+$ <span class="hl kwc">ls</span> ~<span class="hl opt">/</span>i?<span class="hl num">44</span>
+$ crontab <span class="hl kwb">-l</span> | <span class="hl kwc">tail</span> <span class="hl kwb">-3</span></pre></section><section data-coord="prj1.umt:154:0"><h2 data-coord="prj1.umt:154:0">Interaction Log</h2><p data-coord="prj1.umt:157:0"><span id="log" data-coord="prj1.umt:157:7">The</span> behavior of your program is illustrated in the following
+annotated log.
+</p><pre>$ <span class="hl opt">./</span>index<span class="hl opt">.</span>mjs 
+<span class="hl opt">&gt;&gt;</span> a1 <span class="hl opt">=</span> <span class="hl num">22</span>
+<span class="hl opt">{</span> a1<span class="hl opt">:</span> <span class="hl num">22</span> <span class="hl opt">}</span>
+<span class="hl opt">&gt;&gt;</span> a2 <span class="hl opt">=</span> a1 <span class="hl opt">*</span> b1    <span class="hl slc">//b1 not yet defined; defaults to 0</span>
+<span class="hl opt">{</span> a2<span class="hl opt">:</span> <span class="hl num">0</span> <span class="hl opt">}</span>
+<span class="hl opt">&gt;&gt;</span> b1 <span class="hl opt">=</span> <span class="hl num">3</span>
+<span class="hl opt">{</span> a2<span class="hl opt">:</span> <span class="hl num">66</span><span class="hl opt">,</span> b1<span class="hl opt">:</span> <span class="hl num">3</span> <span class="hl opt">}</span>  <span class="hl slc">//b1 now defined; a2 recomputed</span>
+<span class="hl opt">&gt;&gt;</span> a3 <span class="hl opt">=</span> a1 <span class="hl opt">+</span> a2
+<span class="hl opt">{</span> a3<span class="hl opt">:</span> <span class="hl num">88</span> <span class="hl opt">}</span>
+<span class="hl opt">&gt;&gt;</span> a1 <span class="hl opt">=</span> <span class="hl num">3</span>          <span class="hl slc">//a1 redefined; a2 and a3 recomputed</span>
+<span class="hl opt">{</span> a1<span class="hl opt">:</span> <span class="hl num">3</span><span class="hl opt">,</span> a2<span class="hl opt">:</span> <span class="hl num">9</span><span class="hl opt">,</span> a3<span class="hl opt">:</span> <span class="hl num">12</span> <span class="hl opt">}</span>
+<span class="hl opt">&gt;&gt;</span> a1 <span class="hl opt">=</span> a3         <span class="hl slc">//indirect circular references detected</span>
+CIRCULAR_REF<span class="hl opt">:</span> circular ref involving a1
+<span class="hl opt">&gt;&gt;</span> a1 <span class="hl opt">=</span> a3 <span class="hl opt">-</span>       <span class="hl slc">//syntax errors detected</span>
+SYNTAX<span class="hl opt">:</span> unexpected token at <span class="hl str">&apos;&lt;EOF&gt;&apos;</span><span class="hl opt">:</span> expected <span class="hl str">&apos;num&apos;</span>
+<span class="hl opt">&gt;&gt;</span> a1<span class="hl opt">=</span>a1           <span class="hl slc">//direct circular refs detected</span>
+CIRCULAR_REF<span class="hl opt">:</span> circular ref involving a1
+<span class="hl opt">&gt;&gt;</span>                 <span class="hl slc">//indicate EOF on stdin by typing ^D</span>
+$</pre></section><section data-coord="prj1.umt:182:0"><h2 data-coord="prj1.umt:182:0">Provided Files</h2><p data-coord="prj1.umt:185:0">The <a href="./prj1-sol" data-coord="prj1.umt:185:18">prj1-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj1.umt:188:0"><dt data-coord="prj1.umt:188:4"> <a href="./prj1-sol/src/spreadsheet.mjs?colorize=true" data-coord="prj1.umt:188:49">spreadsheet.mjs</a></dt><dd data-coord="prj1.umt:189:0"><p data-coord="prj1.umt:189:6">This skeleton file constitutes the guts of your project.  You
+will need to flesh out the skeleton, adding code as per the
+documentation.  You should feel free to add any auxiliary
+function or method definitions as required.
+</p></dd><dt data-coord="prj1.umt:194:4"> <a href="./prj1-sol/index.mjs?colorize=true" data-coord="prj1.umt:194:39">index.mjs</a> and <a href="./prj1-sol/src/cli.mjs?colorize=true" data-coord="prj1.umt:194:93">cli.mjs</a></dt><dd data-coord="prj1.umt:195:0"><p data-coord="prj1.umt:195:6">These files provide the input-output behavior which is
+required by your program.  It imports
+<a href="./prj1-sol/src/spreadsheet.mjs?colorize=true" data-coord="prj1.umt:195:159">spreadsheet.mjs.</a>
+You should not need to modify these files.
+</p></dd><dt data-coord="prj1.umt:200:4"> <a href="./prj1-sol/src/expr-parser.mjs?colorize=true" data-coord="prj1.umt:200:49">expr-parser.mjs</a></dt><dd data-coord="prj1.umt:201:0"><p data-coord="prj1.umt:201:6">A parser for spreadsheet formulae.  You will need to understand
+the behavior of the exported <samp data-coord="prj1.umt:201:105">parse()</samp> function which is
+documented in the first comment.  
+</p></dd><dt data-coord="prj1.umt:205:4"> <a href="./prj1-sol/src/util.mjs?colorize=true" data-coord="prj1.umt:205:42">util.mjs</a> and <a href="./prj1-sol/src/limits.mjs?colorize=true" data-coord="prj1.umt:205:98">limits.mjs</a></dt><dd data-coord="prj1.umt:206:0"><p data-coord="prj1.umt:206:6">Utility routines and definitions for the spreadsheet limits.
+You should not need to modify these file.
+</p></dd><dt data-coord="prj1.umt:209:4"> <a href="./prj1-sol/src/app-error.mjs?colorize=true" data-coord="prj1.umt:209:47">app-error.mjs</a></dt><dd data-coord="prj1.umt:210:0"><p data-coord="prj1.umt:210:6">A simple class which encapsulates an error having
+a <samp data-coord="prj1.umt:210:64">code</samp> and <samp data-coord="prj1.umt:210:75">message</samp>.
+You should not need to modify this file.
+</p></dd><dt data-coord="prj1.umt:214:4"> <em data-coord="prj1.umt:214:20"><a href="./prj1-sol/test" data-coord="prj1.umt:214:20">Test files</a></em></dt><dd data-coord="prj1.umt:215:0"><p data-coord="prj1.umt:215:6">This directory contains tests for the spreadsheet, scanner and
+parser using the <a href="https://mochajs.org/" data-coord="prj1.umt:215:116">mocha</a> testing framework
+and <a href="https://www.chaijs.com/" data-coord="prj1.umt:215:177">chai</a> assertions.  You may add
+your own tests to this directory.
+</p></dd><dt data-coord="prj1.umt:220:4"> <a href="./prj1-sol/README" data-coord="prj1.umt:220:22">README</a></dt><dd data-coord="prj1.umt:221:0"><p data-coord="prj1.umt:221:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl></section><section data-coord="prj1.umt:229:0"><h2 data-coord="prj1.umt:229:0">Design and Implementation</h2><p data-coord="prj1.umt:232:0">The following information may be useful when working on this project.
+</p><section data-coord="prj1.umt:234:0"><h3 data-coord="prj1.umt:234:0">Use of ES6 Classes</h3><p data-coord="prj1.umt:237:0">At the time of assigning this project, JavaScript objects and ES6
+classes will not have been covered in detail in the course.  However,
+you should be able to use ES6 <code><span class="hl kwc">class</span></code> syntax without needing to
+understand the finer points.
+</p><p data-coord="prj1.umt:242:0">Note that the <samp data-coord="prj1.umt:242:14">class</samp> syntax is a relatively recent addition to
+JavaScript and is syntactic sugar around JavaScript's more flexible
+object model.  Note that even though the use of this <samp data-coord="prj1.umt:242:185">class</samp> syntax
+may make students with a background in class-based OOPL's feel more
+comfortable, there are some differences worth pointing out:
+</p><ul data-coord="prj1.umt:248:0"><li data-coord="prj1.umt:248:0"><p data-coord="prj1.umt:248:4">No data members can be defined within the <samp data-coord="prj1.umt:248:46">class</samp> body.  All
+"instance variables" must be referenced through the <samp data-coord="prj1.umt:248:122">this</samp>
+pseudo-variable in both <samp data-coord="prj1.umt:248:157">constructor</samp> and methods.  For example,
+if we want to initialize an instance variable <samp data-coord="prj1.umt:248:248">cells</samp> in the
+<samp data-coord="prj1.umt:248:267">constructor()</samp> we may have a statement like:
+</p><pre>    <span class="hl kwa">this</span><span class="hl opt">.</span>cells <span class="hl opt">= {};</span></pre></li><li data-coord="prj1.umt:258:0"><p data-coord="prj1.umt:258:4">There is no implicit <samp data-coord="prj1.umt:258:25">this</samp>.  If an instance method needs to call
+another instance method of the same object, the method <strong data-coord="prj1.umt:258:129">must</strong> be
+called through <samp data-coord="prj1.umt:258:158">this</samp>.
+</p></li><li data-coord="prj1.umt:262:0"><p data-coord="prj1.umt:262:4">There is no easy way to get private methods or data.  Instead a
+convention which is often used is to prefix private names with
+something like a underscore and trust <samp data-coord="prj1.umt:262:177">class</samp> clients to not
+misuse those names.
+</p></li></ul></section></section><section data-coord="prj1.umt:267:0"><h2 data-coord="prj1.umt:267:0">Tests</h2><p data-coord="prj1.umt:271:0">The provided code contains tests for the provided scanner and parser
+as well as tests for the spreadsheet you are working on.  The spreadsheet
+tests will initially fail; as you develop your code, you will make
+them succeed, thus practising TDD. You are welcome to add more tests
+(note that different tests than those provided here may be used when
+grading your project).
+</p><p data-coord="prj1.umt:278:0">If you set up your <samp data-coord="prj1.umt:278:19">package.json</samp> as instructed, typing <samp data-coord="prj1.umt:278:56">npm run test</samp>
+should run all tests using the &lt;https://mochajs.org/&gt; mocha testing
+framework.
+</p><section data-coord="prj1.umt:283:0"><h3 data-coord="prj1.umt:283:0">Cell References vs Cell ID's</h3><p data-coord="prj1.umt:286:0">It is a good idea to distinguish between references to a spreadsheet
+cell and the ID for a spreadsheet cell.
+</p><ul data-coord="prj1.umt:289:0"><li data-coord="prj1.umt:289:0"><p data-coord="prj1.umt:289:4">A <strong data-coord="prj1.umt:289:6">cell reference</strong> is used within a formula to refer to a cell.
+It can be a fully relocatable reference like <samp data-coord="prj1.umt:289:117">f6</samp>, a partially
+relocatable reference like <samp data-coord="prj1.umt:289:166">$f6</samp> or <samp data-coord="prj1.umt:289:175">f$6</samp> or a non-relocatable
+reference like <samp data-coord="prj1.umt:289:221">$f$6</samp>.
+</p></li><li data-coord="prj1.umt:294:0"><p data-coord="prj1.umt:294:4">A <strong data-coord="prj1.umt:294:6">cell ID</strong> could be any string which uniquely identifies a cell.
+It seems convenient to reuse the same identification scheme as
+that used externally; i.e. simply use ID's like <samp data-coord="prj1.umt:294:189">f6</samp> to identify a
+cell.  So a cell ID looks like a fully relocatable cell reference.
+Note that a cell ID cannot contain any <samp data-coord="prj1.umt:294:322">$</samp> characters.
+</p></li></ul></section><section data-coord="prj1.umt:300:0"><h3 data-coord="prj1.umt:300:0">Spreadsheet Representation</h3><p data-coord="prj1.umt:303:0">The visual representation of a spreadsheet is a
+2-dimensional grid which seems to map naturally into using a
+2-dimensional array as the internal representation.  But since the
+grid is usually extremely sparse, a spreadsheet is better represented
+simply as a JavaScript object mapping cell ID's to information about a
+cell.
+</p><p data-coord="prj1.umt:310:0"><span id="cellInfo" data-coord="prj1.umt:310:12">The</span> information associated with a spreadsheet cell could
+include properties like the following:
+</p><dl data-coord="prj1.umt:313:0"><dt data-coord="prj1.umt:313:2"> <samp data-coord="prj1.umt:313:1">id</samp> </dt><dd data-coord="prj1.umt:314:0"><p data-coord="prj1.umt:314:4">The ID associated with the cell.
+</p></dd><dt data-coord="prj1.umt:316:2"> <samp data-coord="prj1.umt:316:1">expr</samp> </dt><dd data-coord="prj1.umt:317:0"><p data-coord="prj1.umt:317:4">A string containing the formula for the cell.
+</p></dd><dt data-coord="prj1.umt:319:2"> <samp data-coord="prj1.umt:319:1">value</samp> </dt><dd data-coord="prj1.umt:320:0"><p data-coord="prj1.umt:320:4">A number containing the currently computed value for the cell.
+Should default to 0.
+</p></dd><dt data-coord="prj1.umt:323:2"> <samp data-coord="prj1.umt:323:1">dependents</samp> </dt><dd data-coord="prj1.umt:324:0"><p data-coord="prj1.umt:324:4">A
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" data-coord="prj1.umt:324:102">Set</a> of id's for cells which are <strong data-coord="prj1.umt:324:134">directly</strong> dependent on this cell.
+These sets specify the edges in an
+<em data-coord="prj1.umt:324:260"><a href="https://en.wikipedia.org/wiki/Adjacency_list" data-coord="prj1.umt:324:260">adjacency list</a></em>
+representation of the dependency DAG.
+</p></dd><dt data-coord="prj1.umt:331:2"> <samp data-coord="prj1.umt:331:1">ast</samp> </dt><dd data-coord="prj1.umt:332:0"><p data-coord="prj1.umt:332:4">A cache of the results of parsing the <samp data-coord="prj1.umt:332:42">expr</samp> formula.
+</p></dd></dl><p data-coord="prj1.umt:334:0">In some situations it may also be useful to have a cell contain a
+reference back to its containing spreadsheet.
+</p></section><section data-coord="prj1.umt:338:0"><h3 data-coord="prj1.umt:338:0">Evaluating the Value for a Cell</h3><p data-coord="prj1.umt:341:0">Given an arithmetic expression represented as a string, its
+essential structure can be captured by an <strong data-coord="prj1.umt:341:102">abstract syntax tree</strong> or
+AST.  Note that the expressions <samp data-coord="prj1.umt:341:160">"1 + 2*3"</samp> and <samp data-coord="prj1.umt:341:176">"(1 + (2*3))"</samp> both
+have the same essential structure and will be represented using
+equivalent AST's.  These AST's will be different from the AST
+for the expression <samp data-coord="prj1.umt:341:342">"(1 + 2) * 3"</samp>.
+</p><p data-coord="prj1.umt:348:0">The formulas to be handled by this project are arithmetic expressions
+involving the arithmetic operators <samp data-coord="prj1.umt:348:105">+</samp>, <samp data-coord="prj1.umt:348:110">-</samp> (both prefix and infix),
+<samp data-coord="prj1.umt:348:139">*</samp>, and <samp data-coord="prj1.umt:348:148">/</samp>, functions like <samp data-coord="prj1.umt:348:168">max()</samp> and <samp data-coord="prj1.umt:348:180">min()</samp>, as well as numbers
+and cell references.  The latter two will be represented as AST
+leaves, whereas the operators and functions will be represented as
+internal nodes of the AST.
+</p><p data-coord="prj1.umt:355:0">Evaluating the value for a cell can be done using a simple bottom-up
+recursive traversal of the AST for the formula associated with that
+cell.  This can be done using a simple case analysis on the type
+of the AST node.
+</p><ol data-coord="prj1.umt:360:0"><li data-coord="prj1.umt:360:0"><p data-coord="prj1.umt:360:4"><strong data-coord="prj1.umt:360:4">The node represents a number</strong>: the value is simply that number.
+</p></li><li data-coord="prj1.umt:362:0"><p data-coord="prj1.umt:362:4"><strong data-coord="prj1.umt:362:4">The node represents a cell reference</strong>: the value is simply the
+value of the cell referenced by the AST.
+</p></li><li data-coord="prj1.umt:365:0"><p data-coord="prj1.umt:365:4"><strong data-coord="prj1.umt:365:4">The node represents the application of an operator or function</strong>:
+the value is the result of applying that operator or function
+to the result of <strong data-coord="prj1.umt:365:157">recursively</strong> evaluating the children of that
+node.
+</p></li></ol></section><section data-coord="prj1.umt:370:0"><h3 data-coord="prj1.umt:370:0">Maintaining the Dependency DAG</h3><p data-coord="prj1.umt:373:0">When a cell \(C\) is updated with a new formula and corresponding AST,
+the following steps need to be taken to maintain the dependency DAG:
+</p><ol data-coord="prj1.umt:376:0"><li data-coord="prj1.umt:376:0"><p data-coord="prj1.umt:376:4">If \(C\) already has an associated old formula, then that old
+formula should be traversed for references to prerequisite cells
+and \(C\) needs to be removed as a dependent of the prerequisite
+cells.  This ensures that the DAG does not contain spurious
+dependencies
+</p></li><li data-coord="prj1.umt:382:0"><p data-coord="prj1.umt:382:4">The new formula needs to be traversed for references to
+prerequisite cells and \(C\) needs to be added as a dependent of
+those prerequisite cells.
+</p></li></ol><p data-coord="prj1.umt:386:0">When traversing formula, it is easier to perform a recursive traversal
+of the AST associated with the formula rather than the string formula.
+</p><p data-coord="prj1.umt:389:0">For example, assume that <samp data-coord="prj1.umt:389:25">a4</samp> which has the formula <samp data-coord="prj1.umt:389:52">a3 * b3</samp> and is
+being updated with a new formula <samp data-coord="prj1.umt:389:102">a4 = a3 + a5</samp>.  The old formula <samp data-coord="prj1.umt:389:135">a3
+* b3</samp> must be traversed to remove <samp data-coord="prj1.umt:389:173">a4</samp> from the <samp data-coord="prj1.umt:389:187">dependents</samp> for the
+referenced prerequisite cells <samp data-coord="prj1.umt:389:238">a3</samp> and <samp data-coord="prj1.umt:389:247">b3</samp>.  Then the new formula <samp data-coord="prj1.umt:389:275">a3
++ b5</samp> must be traversed to add <samp data-coord="prj1.umt:389:310">a4</samp> to the <samp data-coord="prj1.umt:389:322">dependents</samp> for the
+referenced prerequisite cells <samp data-coord="prj1.umt:389:373">a3</samp> and <samp data-coord="prj1.umt:389:382">b5</samp>.
+</p></section><section data-coord="prj1.umt:398:0"><h3 data-coord="prj1.umt:398:0">Error Recovery</h3><p data-coord="prj1.umt:401:0"><span id="errors" data-coord="prj1.umt:401:10">An</span> update to a spreadsheet will entail multiple updates to
+individual properties of different cells, but the overall spreadsheet
+update should be
+<a href="https://en.wikipedia.org/wiki/Atomicity_(database_systems)" data-coord="prj1.umt:401:218">atomic;</a>
+i.e. an update either succeeds completely or leaves the spreadsheet
+totally unchanged when an error is detected.
+</p><p data-coord="prj1.umt:408:0">For example, assume that cell <samp data-coord="prj1.umt:408:30">a1</samp> is set to <samp data-coord="prj1.umt:408:45"> 22</samp> and <samp data-coord="prj1.umt:408:55">a2</samp> is set to
+<samp data-coord="prj1.umt:408:70">a1 + 1</samp> which is 23.  Note that <samp data-coord="prj1.umt:408:103">a2</samp> is dependent on <samp data-coord="prj1.umt:408:124">a1</samp> and any
+update to <samp data-coord="prj1.umt:408:147">a1</samp> will result in update to <samp data-coord="prj1.umt:408:177">a2</samp>.  Assume that <samp data-coord="prj1.umt:408:196">a1</samp> is
+attempted to be set to the formula <samp data-coord="prj1.umt:408:239">a2 * 2</samp> introducing a circular
+dependency.  Depending on the implementation, it is possible that <samp data-coord="prj1.umt:408:337">a1</samp>
+will be set to 46, before the circular dependency is detected and the
+update aborted.  Such partial updates are not acceptable and need to
+be rolled back.
+</p><p data-coord="prj1.umt:417:0">So when an error is detected, it is necessary to completely rollback
+any partial updates.  Some possibilities to implement this rollback:
+</p><p data-coord="prj1.umt:420:0"><strong data-coord="prj1.umt:420:0">Implement an Undo Capability</strong>
+</p><p data-coord="prj1.umt:422:0">Before updating a property of a spreadsheet cell, remember the
+previous version of the property in some kind of undo object which
+tracks the cell, property name and original value. Add each undo
+object to a stack of undo objects associated with the spreadsheet.
+</p><p data-coord="prj1.umt:427:0">If the full spreadsheet update succeeds, simply discard the undo
+objects.  OTOH, if an error occurs then use the saved stack of undo
+objects to restore the state of the spreadsheet to what it was before
+the attempted update.
+</p><p data-coord="prj1.umt:432:0">Note that when a property contains a mutable data structure like an
+array or a set, remembering the previous state of that property will
+require making a deep copy of the data structure before mutating it.
+</p><p data-coord="prj1.umt:436:0">One advantage of this approach is that its use need not be restricted
+only to rollback after an error; it can also be used for implementing
+an external undo/redo capability.
+</p><p data-coord="prj1.umt:440:0">Note that this is related to the
+<a href="https://en.wikipedia.org/wiki/Memento_pattern" data-coord="prj1.umt:440:82">Memento</a> pattern.
+</p><p data-coord="prj1.umt:444:0"><strong data-coord="prj1.umt:444:0">Use Shadow Cells</strong>
+</p><p data-coord="prj1.umt:446:0">When it is necessary to update a cell, do not make the update directly
+to the cell.  Instead implement the update on a shadow cell which is a
+deep copy of the original cell.  Route subsequent reads and writes for
+that particular cell to the shadow cell.
+</p><p data-coord="prj1.umt:451:0">If the full spreadsheet update succeeds, then copy the shadow cells
+back into the original cells. OTOH, if an error occurs then simply
+discard the shadow cells.
+</p><p data-coord="prj1.umt:455:0"><strong data-coord="prj1.umt:455:0">Use Immutable Data Structures</strong>
+</p><p data-coord="prj1.umt:457:0">Using <em data-coord="prj1.umt:457:65"><a href="https://en.wikipedia.org/wiki/Persistent_data_structure" data-coord="prj1.umt:457:65">persistent data structures</a></em> for implementing the spreadsheet
+would obviate the necessity to undo updates after an error.  
+</p></section></section><section data-coord="prj1.umt:462:0"><h2 data-coord="prj1.umt:462:0">Hints</h2><p data-coord="prj1.umt:465:0">You should feel free to use any of the functions from the standard
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" data-coord="prj1.umt:465:126">library;</a> in
+particular, functions provided by the
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" data-coord="prj1.umt:465:266">Array,</a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/" data-coord="prj1.umt:465:365">String,</a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" data-coord="prj1.umt:465:461">Set</a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math" data-coord="prj1.umt:465:558">Math</a> objects may prove useful.  You should not use any nodejs library
+functions to make it possible to run this code within the browser in
+future projects.  You should also not need to include additional npm
+packages.
+</p><p data-coord="prj1.umt:481:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj1.umt:484:0"><li data-coord="prj1.umt:484:0"><p data-coord="prj1.umt:484:4">If you have not already done so, set up your course VM as per the
+instructions specified in the <em data-coord="prj1.umt:484:145"><a href="../../misc/vm-setup/vm-setup.html" data-coord="prj1.umt:484:145">VM Setup</a></em> and <em data-coord="prj1.umt:484:199"><a href="../../misc/git-setup/git-setup.html" data-coord="prj1.umt:484:199">Git Setup</a></em>
+documents.
+</p></li><li data-coord="prj1.umt:489:0"><p data-coord="prj1.umt:489:4">Understand the project requirements thoroughly including the first
+comment in <a href="./prj1-sol/src/spreadsheet.mjs?colorize=true" data-coord="prj1.umt:489:138">spreadsheet.mjs.</a>  Verify your understanding by looking at the
+provided <em data-coord="prj1.umt:489:221"><a href="#log" data-coord="prj1.umt:489:221">interaction log</a></em>.
+</p><p data-coord="prj1.umt:494:4">Make sure you understand the behavior of the <samp data-coord="prj1.umt:494:49">parse()</samp> function
+provided by <a href="./prj1-sol/src/expr-parser.mjs?colorize=true" data-coord="prj1.umt:494:136">expr-parser.mjs</a> including the structure of the returned AST.
+This is documented in the first comment in that file.
+</p><p data-coord="prj1.umt:499:4">Decide on how you will implement <em data-coord="prj1.umt:499:48"><a href="#errors" data-coord="prj1.umt:499:48">error recovery</a></em>.
+</p></li><li data-coord="prj1.umt:501:0"><p data-coord="prj1.umt:501:4">Look into debugging methods for your project.  Possibilities
+include:
+</p><ul data-coord="prj1.umt:504:0"><li data-coord="prj1.umt:504:0"><p data-coord="prj1.umt:504:8">Logging debugging information onto the terminal using
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/log" data-coord="prj1.umt:504:135">console.log()</a> or
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/error" data-coord="prj1.umt:504:220">console.error().</a>
+</p></li><li data-coord="prj1.umt:510:0"><p data-coord="prj1.umt:510:8">Use the chrome debugger as outlined in this
+<a href="https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27" data-coord="prj1.umt:510:164">article.</a>  Specifically, use the <samp data-coord="prj1.umt:510:196">--inspect-brk</samp> node option
+when starting your program and then visit <samp data-coord="prj1.umt:510:267">about://inspect</samp>
+in your chrome browser.
+</p><p data-coord="prj1.umt:516:1">There seems to be some problems getting all necessary
+files loaded in to the chrome debugger.  This may be
+due to the use of ES6 modules. When your program
+starts up under the debugger use the <em data-coord="prj1.umt:516:197">return from current
+	function</em> control until the necessary source files are
+available in the debugger at which point you can insert
+necessary breakpoints.
+</p></li></ul><p data-coord="prj1.umt:524:4">It is well worth spending a few minutes setting up the chrome
+debugger as it could save you a lot of debugging time.
+</p></li><li data-coord="prj1.umt:528:0"><p data-coord="prj1.umt:528:4">Start your project by creating a new <samp data-coord="prj1.umt:528:41">prj1-sol</samp> branch of your
+<samp data-coord="prj1.umt:528:71">i444</samp> or <samp data-coord="prj1.umt:528:81">i544</samp> directory corresponding to your github
+repository. Then copy over all the provided files:
+</p><pre>    $ <span class="hl kwb">cd</span> ~<span class="hl opt">/</span>i?<span class="hl num">44</span>
+    $ git checkout <span class="hl kwb">-b</span> prj1-sol <span class="hl slc">#create new branch</span>
+    $ mkdir <span class="hl kwb">-p</span> submit          <span class="hl slc">#ensure you have a submit dir</span>
+    $ <span class="hl kwb">cd</span> submit                <span class="hl slc">#enter project dir</span>
+    $ <span class="hl kwc">cp</span> <span class="hl kwb">-r</span> ~<span class="hl opt">/</span>cs544<span class="hl opt">/</span>projects<span class="hl opt">/</span>prj<span class="hl num">1</span><span class="hl opt">/</span>prj1-sol .  <span class="hl slc">#copy provided files</span>
+    $ <span class="hl kwb">cd</span> prj1-sol              <span class="hl slc">#change over to new project dir</span></pre></li><li data-coord="prj1.umt:543:0"><p data-coord="prj1.umt:543:4">Set up this project as an npm package:
+</p><pre>    npm init <span class="hl kwb">-y</span>              <span class="hl slc">#create package.json</span>
+    npm <span class="hl kwc">install</span> <span class="hl kwb">--save-dev</span> \ <span class="hl slc">#install development dependencies</span>
+      mocha chai             <span class="hl slc">#for testing</span></pre><p data-coord="prj1.umt:552:4">Replace the contents of the <samp data-coord="prj1.umt:552:32">script</samp> property in the newly
+created <samp data-coord="prj1.umt:552:75">package.json</samp> with
+</p><pre>    <span class="hl str">&quot;test&quot;</span><span class="hl opt">:</span> <span class="hl str">&quot;mocha test/&quot;</span><span class="hl opt">,</span>
+    <span class="hl str">&quot;debug-test&quot;</span><span class="hl opt">:</span> <span class="hl str">&quot;mocha --inspect-brk test/&quot;</span></pre><p data-coord="prj1.umt:560:4">[Be careful with adhering to JSON syntax.]
+</p><p data-coord="prj1.umt:562:4">This will set up testing scripts.  You should now be able to run
+the provided parser and scanner tests using the command <samp data-coord="prj1.umt:562:129">npm run
+    test</samp>.
+</p></li><li data-coord="prj1.umt:567:0"><p data-coord="prj1.umt:567:4">Commit into git:
+</p><pre>    $ git add .   <span class="hl slc">#add contents of directory to git </span>
+    $ git commit <span class="hl kwb">-m</span> <span class="hl str">&apos;started prj1&apos;</span> <span class="hl slc">#commit locally</span>
+    $ git push <span class="hl kwb">-u</span> origin prj1-sol  <span class="hl slc">#push branch with changes</span>
+                                   <span class="hl slc">#to github</span></pre><p data-coord="prj1.umt:577:4">[To avoid loosing work, you should get into the habit of
+periodically <samp data-coord="prj1.umt:577:78">commit</samp>'ting your work and <samp data-coord="prj1.umt:577:106">push</samp>'ing it
+to github.]
+</p></li><li data-coord="prj1.umt:582:0"><p data-coord="prj1.umt:582:4">Replace the <samp data-coord="prj1.umt:582:16">XXX</samp> entries in the <samp data-coord="prj1.umt:582:37">README</samp> template and
+commit to github:
+</p><pre data-coord="prj1.umt:586:0">    $ git commit -a -m 'updated README'
+    $ git push
+</pre></li><li data-coord="prj1.umt:590:0"><p data-coord="prj1.umt:590:4">Capture an image to validate that you have set up your course VM
+as instructed.  Within a terminal window in your <samp data-coord="prj1.umt:590:122">x2go</samp> client
+window, type in the following commands:
+</p><pre>    $ hostname<span class="hl opt">;</span> hostname <span class="hl kwb">-I</span>
+    $ <span class="hl kwc">ls</span> ~<span class="hl opt">/</span>projects
+    $ <span class="hl kwc">ls</span> ~<span class="hl opt">/</span>cs544
+    $ <span class="hl kwc">ls</span> ~<span class="hl opt">/</span>i?<span class="hl num">44</span>
+    $ crontab <span class="hl kwb">-l</span> | <span class="hl kwc">tail</span> <span class="hl kwb">-3</span></pre><p data-coord="prj1.umt:603:4">Use an image capture program on your <strong data-coord="prj1.umt:603:41">workstation</strong> to capture an
+image of your <samp data-coord="prj1.umt:603:87">x2go</samp> client window into a file <samp data-coord="prj1.umt:603:120">vm.png</samp>.  The
+captured image should show the terminal window containing the
+output of the above commands as part of the <samp data-coord="prj1.umt:603:249">x2go</samp> client window.
+Move the <samp data-coord="prj1.umt:603:284">vm.png</samp> file from your workstation to your VM's
+<samp data-coord="prj1.umt:603:337">~/?44/submit/prj1-sol</samp> directory (you can use <samp data-coord="prj1.umt:603:384">scp</samp>; if your
+workstation cannot connect directly to your VM, then do a 2 step
+copy using <samp data-coord="prj1.umt:603:483">remote.cs</samp> as an intermediate).
+</p><p data-coord="prj1.umt:612:4">Add, commit and push the <samp data-coord="prj1.umt:612:29">vm.png</samp> file.
+</p></li><li data-coord="prj1.umt:615:0"><p data-coord="prj1.umt:615:4">You should be able to run the project, but except for
+error checking performed by <samp data-coord="prj1.umt:615:90">cli.mjs</samp>, all cell definitions will simply
+return empty objects until you replace the @TODO sections
+with suitable code.
+</p><pre>    $ <span class="hl opt">./</span>index<span class="hl opt">.</span>mjs
+    <span class="hl opt">&gt;&gt;</span> a1
+    input must be of type <span class="hl str">&quot;cellId = expr&quot;</span>
+    <span class="hl opt">&gt;&gt;</span> aa1 <span class="hl opt">=</span> <span class="hl num">3</span>
+    SYNTAX<span class="hl opt">:</span> bad cell ref aa1
+    <span class="hl opt">&gt;&gt;</span> a1 <span class="hl opt">=</span> <span class="hl num">3</span>
+    <span class="hl opt">{}</span>
+    <span class="hl opt">&gt;&gt;</span>     <span class="hl ppc">#type ^D to return to the shell</span>
+    $</pre></li><li data-coord="prj1.umt:633:0"><p data-coord="prj1.umt:633:4">You should be able to run the tests using <samp data-coord="prj1.umt:633:46">npm run test</samp>.  All the
+<samp data-coord="prj1.umt:633:75">parse</samp> and <samp data-coord="prj1.umt:633:87">scan</samp> tests should succeed, but all the <samp data-coord="prj1.umt:633:128">spreadsheet</samp>
+tests will fail.  You will need to add code to make all the tests
+<a href="https://www.codecademy.com/articles/tdd-red-green-refactor" data-coord="prj1.umt:633:282">green.</a>
+</p></li><li data-coord="prj1.umt:639:0"><p data-coord="prj1.umt:639:4">Open your copy of the <samp data-coord="prj1.umt:639:26">spreadsheet.mjs</samp> file in your project
+directory.  It contains
+</p><ol data-coord="prj1.umt:642:0"><li data-coord="prj1.umt:642:0"><p data-coord="prj1.umt:642:8">Imports of auxiliary modules.
+</p></li><li data-coord="prj1.umt:644:0"><p data-coord="prj1.umt:644:8">A skeleton <samp data-coord="prj1.umt:644:19">Spreadsheet</samp> class which is exported as the
+<code><span class="hl kwa">default</span> export</code> of the file.  It contains a static
+factory method which simply calls a skeleton constructor as
+well as a skeleton for the required <samp data-coord="prj1.umt:644:223">eval()</samp> method.
+</p></li><li data-coord="prj1.umt:649:0"><p data-coord="prj1.umt:649:8">A table mapping <samp data-coord="prj1.umt:649:24">fn</samp> strings to the corresponding functions.
+</p></li></ol><p data-coord="prj1.umt:651:4">Some points worth making about the provided code:
+</p><ul data-coord="prj1.umt:653:0"><li data-coord="prj1.umt:653:0"><p data-coord="prj1.umt:653:8">All the methods have been declared <samp data-coord="prj1.umt:653:43">async</samp>.  This is not
+needed for this project, but will be necessary for subsequent
+projects.  You can safely ignore the <samp data-coord="prj1.umt:653:173">async</samp> declarations and
+write code normally.
+</p></li><li data-coord="prj1.umt:658:0"><p data-coord="prj1.umt:658:8">For error handling, the convention used is that all user
+errors should be thrown as <samp data-coord="prj1.umt:658:100">AppError</samp> objects (for example,
+see the code in the <samp data-coord="prj1.umt:658:154">match()</samp> method within the
+<a href="prj1-sol/src/expr-parser.mjs?colorize=true" data-coord="prj1.umt:658:229">ExprParser</a> <code><span class="hl kwc">class</span></code>.
+</p><pre>        <span class="hl kwa">if</span> <span class="hl opt">(</span>circular dependency detected<span class="hl opt">) {</span>
+          <span class="hl kwb">const</span> msg <span class="hl opt">=</span> `cyclic dependency <span class="hl opt">...</span>`<span class="hl opt">;</span>
+          <span class="hl kwa">throw new</span> <span class="hl kwd">AppError</span><span class="hl opt">(</span><span class="hl str">&apos;CIRCULAR_REF&apos;</span><span class="hl opt">,</span> msg<span class="hl opt">);</span>
+        <span class="hl opt">}</span></pre><p data-coord="prj1.umt:670:8">This allows the calling code to distinguish between exceptions
+caused by intentional error reporting and those caused
+inadvertently, allowing the former to be reported as simple
+error messages whereas the latter will be reported with a full
+stack trace.  This makes it much easier to debug your code
+when you get unintentional exceptions.
+</p></li></ul></li><li data-coord="prj1.umt:677:0"><p data-coord="prj1.umt:677:4">Create an auxiliary <samp data-coord="prj1.umt:677:24">CellInfo</samp> class to package up the
+<a href="#cellInfo" data-coord="prj1.umt:677:76">information</a> associated with a spreadsheet
+cell.
+</p></li><li data-coord="prj1.umt:681:0"><p data-coord="prj1.umt:681:4">Add code to the <samp data-coord="prj1.umt:681:20">Spreadsheet</samp> <code>constructor</code> to set up
+an object mapping cell id's to <samp data-coord="prj1.umt:681:94">CellInfo</samp>'s.
+</p></li><li data-coord="prj1.umt:684:0"><p data-coord="prj1.umt:684:4">Add code to the <samp data-coord="prj1.umt:684:20">eval()</samp> method to print out the AST for
+a formula:
+</p><ol data-coord="prj1.umt:687:0"><li data-coord="prj1.umt:687:0"><p data-coord="prj1.umt:687:8">Parse the <samp data-coord="prj1.umt:687:18">baseCellId</samp> <samp data-coord="prj1.umt:687:31">expr</samp> formula using the provided
+parse() function into an AST. 
+</p></li><li data-coord="prj1.umt:690:0"><p data-coord="prj1.umt:690:8">Print out the AST using
+</p><pre>        console<span class="hl opt">.</span><span class="hl kwd">log</span><span class="hl opt">(</span><span class="hl kwd">inspect</span><span class="hl opt">(</span>ast<span class="hl opt">,</span> <span class="hl kwa">false</span><span class="hl opt">,</span> Infinity<span class="hl opt">));</span></pre></li></ol><p data-coord="prj1.umt:696:4">Execute the project with input like <samp data-coord="prj1.umt:696:40">a1 = 22</samp> or <samp data-coord="prj1.umt:696:53">a2 = 3 * ($a4 +
+    b$5)</samp> and you should see the printed AST on your console.
+</p><p data-coord="prj1.umt:699:4">As you develop the project, you may find it useful to print AST's
+in order to understand their structure.
+</p></li><li data-coord="prj1.umt:702:0"><p data-coord="prj1.umt:702:4">Write an auxiliary method to evaluate an AST which simply contains
+a number.  This auxiliar method should do a switch on the <samp data-coord="prj1.umt:702:133">type</samp>
+of the AST node.  For now, simply handle the case when the <samp data-coord="prj1.umt:702:203">type</samp>
+is <samp data-coord="prj1.umt:702:217">num</samp> and simply return the node's <samp data-coord="prj1.umt:702:252">value</samp> property as the
+evaluation.  
+</p><p data-coord="prj1.umt:708:4">If you hook up your auxiliary function into the main <samp data-coord="prj1.umt:708:57">eval()</samp>
+function correctly, you should be able to make the first
+spreadsheet test green!
+</p></li><li data-coord="prj1.umt:712:0"><p data-coord="prj1.umt:712:4">In this step you will evaluate spreadsheet formulae like <samp data-coord="prj1.umt:712:61">a1 = 1 +
+    2 * -3</samp> which do not contain any cell references.
+</p><p data-coord="prj1.umt:715:4">Extend your AST evaluation method to handle <samp data-coord="prj1.umt:715:48">app</samp> nodes.
+Recursively evaluate the <samp data-coord="prj1.umt:715:90">kids</samp> to get a list of kid values.  Then
+lookup the function corresponding to <samp data-coord="prj1.umt:715:173">fn</samp> in the provided <samp data-coord="prj1.umt:715:194">FNS</samp>
+table.  Then simply apply the returned function to the list of
+kid values using the spread operator.
+</p><p data-coord="prj1.umt:721:4">You should now be able to make the second spreadsheet test green!
+</p></li><li data-coord="prj1.umt:723:0"><p data-coord="prj1.umt:723:4">Now extend your evaluation function to handle cell references.
+The AST represents cells using (possibly relative) row and column
+indexes, but calling the <samp data-coord="prj1.umt:723:166">toString(baseCellId)</samp> on that AST node
+will return the cell coordinates as a user-oriented ref like <samp data-coord="prj1.umt:723:271">c33</samp>
+or <samp data-coord="prj1.umt:723:284">$d23</samp>.  Use the <samp data-coord="prj1.umt:723:301">cellRefToCellId()</samp> utility method to convert
+from the cell reference to a cell id and then look up the cell
+value using your spreadsheet data structure.
+</p><p data-coord="prj1.umt:731:4">This should make the next two tests green.
+</p></li><li data-coord="prj1.umt:733:0"><p data-coord="prj1.umt:733:4">Set up your spreadsheet data structure so that looking up the
+value of an unassigned cell returns 0; that should take care
+of one more test.
+</p></li><li data-coord="prj1.umt:737:0"><p data-coord="prj1.umt:737:4">Now set up dependency tracking.
+</p><ol data-coord="prj1.umt:739:0"><li data-coord="prj1.umt:739:0"><p data-coord="prj1.umt:739:8">When a formula is being assigned to a base call \(B\) which
+already has an existing formula, remove \(B\) from the
+dependents of cells referenced by the existing formula.
+</p></li><li data-coord="prj1.umt:743:0"><p data-coord="prj1.umt:743:8">When evaluating a cell reference to cell \(C\) in the formula
+for base cell \(B\), add \(B\) to the dependents of cell \(C\).
+</p></li></ol></li><li data-coord="prj1.umt:746:0"><p data-coord="prj1.umt:746:4">When a cell is evaluated, all its dependent cells need to be evaluated
+too.  But these evaluations can cascade.  This can be done using
+a <em data-coord="prj1.umt:746:202"><a href="https://en.wikipedia.org/wiki/Depth-first_search" data-coord="prj1.umt:746:202">depth-first
+    search</a></em>.  To detect cyclic dependencies, maintain a set of the cell
+id's which are currently being evaluated and stop the cascade when
+an attempt is made to re-evaluate a cell which is already on the list.
+</p></li><li data-coord="prj1.umt:753:0"><p data-coord="prj1.umt:753:4">Modify your code to add in your chosen error recovery strategy.
+</p></li><li data-coord="prj1.umt:755:0"><p data-coord="prj1.umt:755:4">Iterate until you meet all requirements and all tests are green.
+</p></li></ol><p data-coord="prj1.umt:757:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When it is complete
+please follow the procedure given in the
+<em data-coord="prj1.umt:757:219"><a href="../../misc/git-setup/git-setup.html#prj-submit" data-coord="prj1.umt:757:219">git setup</a></em> document
+to submit your project to the TA via github.
+</p></section></section>
+    </div> <!-- #content -->
+    <script src="../../assets/scripts/loginAction.js"></script>
+  </body>
+</html>
