@@ -6,6 +6,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "cs544-ss": "file:../../../../cs544/lib/cs544-ss",
+    "npm": "^8.5.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
